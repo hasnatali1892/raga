@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import openai
 import matplotlib.pyplot as plt
+import re
 
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
@@ -24,6 +25,17 @@ uploaded_file = st.file_uploader("Upload CSV with Risk Data", type=["csv"])
 selected_risks = []
 df = None
 
+def extract_risk_ratings(text):
+    ratings = {'Critical': 0, 'High': 0, 'Medium': 0, 'Low': 0}
+
+    matches = re.findall(r'(Critical|High|Medium|Low)', text)
+
+    for match in matches:
+        if match in ratings:
+            ratings[match] += 1
+
+    return ratings
+
 if uploaded_file:
     try:
 
@@ -45,14 +57,16 @@ if uploaded_file:
                 st.write(f"*Selected Risks:* {', '.join(selected_risks)}")
 
                 risks_description = "\n".join([f"- {risk}" for risk in selected_risks])
-                prompt = f"Analyze the following risks and provide a detailed cybersecurity risk assessment:\n{risks_description}"
+                prompt = f"Analyze the following risks and provide a detailed cybersecurity risk assessment. "\
+                         f"For each risk, categorize it explicitly as 'Critical', 'High', 'Medium', or 'Low' using the format: 'Risk: Level'. "\
+                         f"Here are the risks:\n{risks_description}"
 
                 with st.spinner("Generating risk analysis..."):
                     response = openai.ChatCompletion.create(
                         model="gpt-4",
                         messages=[
                             {"role": "system", "content": "You are a cybersecurity risk analyst and perform risk assessment."},
-                            {"role": "user", "content": f"Analyze the following risks and provide a detailed cybersecurity risk assessment:\n\n{risks_description}"}
+                            {"role": "user", "content": prompt}
                         ],
                         max_tokens=1500,
                         temperature=0.5,
@@ -62,17 +76,22 @@ if uploaded_file:
                 st.markdown("### Risk Analysis Summary")
                 st.write(analysis)
 
-                ratings = {'Critical': 1, 'High': 2, 'Medium': 2, 'Low': 3}  
-                labels = list(ratings.keys())
-                sizes = list(ratings.values())
-                colors = ['#FF4C4C', '#FFA500', '#FFD700', '#98FB98']
+                ratings = extract_risk_ratings(analysis)
 
-                fig, ax = plt.subplots()
-                ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=colors)
-                ax.axis('equal')
+                if sum(ratings.values()) > 0:
 
-                st.markdown("### Risk Rating Distribution")
-                st.pyplot(fig)
+                    labels = list(ratings.keys())
+                    sizes = list(ratings.values())
+                    colors = ['#FF4C4C', '#FFA500', '#FFD700', '#98FB98']
+
+                    fig, ax = plt.subplots()
+                    ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=colors)
+                    ax.axis('equal')
+
+                    st.markdown("### Risk Rating Distribution")
+                    st.pyplot(fig)
+                else:
+                    st.warning("No risk ratings found in the analysis. Make sure the API response contains the expected 'Critical', 'High', 'Medium', or 'Low' labels.")
 
             else:
                 st.info("Please select at least one risk to analyze.")
