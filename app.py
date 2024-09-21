@@ -32,7 +32,9 @@ def upload_file():
     Upload and process a CSV file containing risk data.
     Ensure the file contains a 'risks' column.
     """
-    uploaded_file = st.file_uploader("Step 1: Upload CSV with Risk Data", type=["csv"])
+
+    st.subheader("Step 1: Upload CSV with Risk Data")
+    uploaded_file = st.file_uploader("Upload CSV with Risk Data", type=["csv"])
     if uploaded_file:
         try:
             # Read the CSV file
@@ -92,11 +94,12 @@ def generate_risk_analysis(selected_risks):
     The analysis categorizes risks into Critical, High, Medium, and Low.
     """
     risks_description = "\n".join([f"- {risk}" for risk in selected_risks])
-    prompt = (f"Analyze the following risks and provide a detailed cybersecurity risk assessment. "
-              f"For each risk, categorize it explicitly as 'Critical', 'High', 'Medium', or 'Low' using the format: 'Risk: Level', and cybersecurity risk treatment. "
+    prompt = (f"Analyzed the following risks and write a detailed cybersecurity risk statement, "
+              f"For each risk categorize it explicitly as 'Critical', 'High', 'Medium', or 'Low'"
+              f"using the format: 'Risk: Level', and cybersecurity risk treatment. "
               f"Here are the risks:\n{risks_description}")
 
-    with st.spinner("Step 3: Generating risk analysis..."):
+    with st.spinner("Generating risk analysis..."):
         # Call the OpenAI API to get the risk analysis
         response = openai.ChatCompletion.create(
             model="gpt-4",
@@ -104,7 +107,7 @@ def generate_risk_analysis(selected_risks):
                 {"role": "system", "content": "You are a cybersecurity risk analyst and perform risk assessment."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=1500,
+            max_tokens=2500,
             temperature=0.5,
         )
     
@@ -149,7 +152,7 @@ def main():
         if selected_risks:
             # Step 3: Generate Risk Analysis
             analysis = generate_risk_analysis(selected_risks)
-            st.markdown("### Risk Analysis Summary")
+            st.markdown("### Step 3: Risk Analysis Summary")
             st.write(analysis)
 
             # Step 4: Extract and Display Risk Ratings
