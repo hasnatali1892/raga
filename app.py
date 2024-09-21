@@ -19,7 +19,7 @@ def display_header():
     """
     Display the main title and sidebar instructions.
     """
-    st.title("IT Risk Assessment with Generative AI (RAGA)")
+    st.title("IT Risk Assessment with Generative AI (IT-RAGA)")
     st.subheader("Upload your data, select specific risks, and uncover critical insights")
     st.sidebar.title("Instructions")
     st.sidebar.info("1. Upload a CSV file with risk data.\n"
