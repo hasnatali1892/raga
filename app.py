@@ -22,9 +22,9 @@ def display_header():
     st.title("IT Risk Assessment with Generative AI (IT-RAGA)")
     st.subheader("Upload your data, select specific risks, and uncover critical insights")
     st.title("Instructions")
-    st.info("1. Upload a CSV file with risk data.\n"
-            "2. Select risks to analyze.\n"
-            "3. View risk assessment breakdown.")
+    st.info("Step 1. Upload a CSV file with cybersecurity risks data.\n\n"
+            "Step 2. Select risks to analyze.\n\n"
+            "Step 3. View risk assessment breakdown.")
 
 # Upload and read CSV
 def upload_file():
@@ -120,10 +120,11 @@ def generate_risk_analysis(selected_risks):
     analysis = response.choices[0].message['content'].strip()
     return analysis
 
-# Display pie chart of risk ratings
+# Display pie chart of risk ratings with legend
 def display_pie_chart(ratings):
     """
-    Display a pie chart showing the distribution of the extracted risk ratings.
+    Display a pie chart showing the distribution of the extracted risk ratings,
+    with a legend indicating the color for each risk level.
     """
     if sum(ratings.values()) > 0:
         labels = list(ratings.keys())
@@ -131,8 +132,22 @@ def display_pie_chart(ratings):
         colors = ['#FF4C4C', '#FFA500', '#FFD700', '#98FB98']
 
         fig, ax = plt.subplots()
-        ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=colors)
-        ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+        wedges, texts, autotexts = ax.pie(
+            sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=colors
+        )
+
+        # Equal aspect ratio ensures that pie is drawn as a circle.
+        ax.axis('equal')
+
+        # Add a legend with labels and their corresponding colors
+        ax.legend(wedges, labels, title="Risk Levels", loc="center left", bbox_to_anchor=(1, 0, 0.5, 1))
+
+        # Improve text appearance
+        for text in texts:
+            text.set_fontsize(10)
+        for autotext in autotexts:
+            autotext.set_fontsize(10)
+            autotext.set_color('white')
 
         st.markdown("### Risk Rating Distribution")
         st.pyplot(fig)
