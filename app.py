@@ -22,9 +22,9 @@ def display_header():
     st.title("IT Risk Assessment with Generative AI (IT-RAGA)")
     st.subheader("Upload your data, select specific risks, and uncover critical insights")
     st.title("Instructions")
-    st.info("Step 1. Upload a CSV file with cybersecurity risks data.\n\n"
-            "Step 2. Select risks to analyze.\n\n"
-            "Step 3. View risk assessment breakdown.")
+    st.info("Step 1. Upload a CSV file with cybersecurity risks data\n\n"
+            "Step 2. Select risks to analyze\n\n"
+            "Step 3. Risk Analysis Summary")
 
 # Upload and read CSV
 def upload_file():
@@ -32,7 +32,7 @@ def upload_file():
     Upload and process a CSV file containing risk data.
     Ensure the file contains a 'risks' column.
     """
-    st.subheader("Step 1: Upload CSV with Risk Data")
+    st.subheader("Step 1: Upload CSV with Cybersecurity Risk Data")
     uploaded_file = st.file_uploader("Upload CSV with Risk Data", type=["csv"])
     if uploaded_file:
         try:
@@ -58,7 +58,7 @@ def select_risks(df):
     Each risk will have its own checkbox.
     """
     risks = df['risks'].unique().tolist()
-    st.subheader("Step 2: Select Risks to Analyze")
+    st.subheader("Step 2: Select risks to analyze")
     selected_risks = []
     select_all = st.checkbox("Select All Risks")
 
